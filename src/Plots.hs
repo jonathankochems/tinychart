@@ -43,8 +43,8 @@ fromHistogram deriveLegend above _filters _filename _histogram
                  , deriveAbbreviateLegend = deriveLegend 
                  }
 
-histogram_plots :: HistogramPlot -> IO ()
-histogram_plots hplot = do
+histogramPlots :: HistogramPlot -> IO ()
+histogramPlots hplot = 
       forM_ fs $ \(b,f) -> do
         let op | not b     = (>=)
                | otherwise = (<=) 

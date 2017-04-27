@@ -13,11 +13,12 @@ module CrossPlots where
 
 -- Data
 import Data.Maybe
-import Data.List(sortBy)
+import Data.List(sortBy, nub)
 import Data.Function(on)
 import qualified Data.Set as Set
-import Data.List(nub)
-import Control.Monad(when)
+
+-- Control
+import Control.Monad(when, unless)
 
 -- plotting
 import Graphics.Rendering.Chart.Easy
@@ -31,8 +32,8 @@ data CrossPlot = CrossPlot {
   , filename :: String
 } deriving (Show, Read)
 
-cross_plot :: CrossPlot -> IO ()
-cross_plot crossplot = toFile def plotFileName $ do
+crossPlot :: CrossPlot -> IO ()
+crossPlot crossplot = toFile def plotFileName $ do
     let stringYs    = Set.fromList $ map snd xys
         x0          = minimum $ map fst xys
         xmax        = maximum $ map fst xys
@@ -40,7 +41,7 @@ cross_plot crossplot = toFile def plotFileName $ do
         legendIndex = sortBy (compare `on` snd) $ nub [(y, y `Set.findIndex` stringYs) | (x,y) <- xys] 
     layout_title .= "CrossPlot"
     liftCState $ shapes %= (:) PointShapeCross
-    plot $ do 
+    plot $  
       liftEC $ do
         color <- takeColor
         shape <- takeShape
@@ -56,7 +57,7 @@ cross_plot crossplot = toFile def plotFileName $ do
             isFilled _ = False 
 
         -- Show borders for unfilled shapes
-        when (not (isFilled shape)) $ do
+        unless (isFilled shape) $ do
             plot_points_style . point_border_color .= color
             plot_points_style . point_border_width .= 1
     plot $ do setColors [opaque white]
