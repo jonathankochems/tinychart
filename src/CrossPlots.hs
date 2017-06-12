@@ -30,6 +30,7 @@ import PlotUtils
 data CrossPlot = CrossPlot {
     dataPoints :: [(Int,String)]
   , filename :: String
+  , surpressLegend :: Bool
 } deriving (Show, Read)
 
 crossPlot :: CrossPlot -> IO ()
@@ -63,9 +64,10 @@ crossPlot crossplot = toFile def plotFileName $ do
     plot $ do setColors [opaque white]
               points "" [(x0,-1),(xmax+1,Set.size stringYs)]
 
-    layout_plots %= \ps ->
-      let p = head ps
-      in
-      p `addMapToLegend` legendIndex : tail ps
+    when (not $ surpressLegend crossplot) $
+      layout_plots %= \ps ->
+        let p = head ps
+        in
+        p `addMapToLegend` legendIndex : tail ps
   where plotFileName = filename crossplot
         xys          = dataPoints crossplot
